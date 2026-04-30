@@ -1,0 +1,42 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #111111;
+  --surface: #1a1a1a;
+  --surface-raised: #2c2c2c;
+  --border: #333333;
+  --text: #ffffff;
+  --text-muted: #969696;
+  --accent: #6c47ff;
+  --accent-hover: #7c5aff;
+  --added-bg: rgba(63, 185, 80, 0.15);
+  --added-border: rgba(63, 185, 80, 0.4);
+  --removed-bg: rgba(248, 81, 73, 0.15);
+  --removed-border: rgba(248, 81, 73, 0.4);
+  --changed-bg: rgba(210, 153, 34, 0.15);
+  --changed-border: rgba(210, 153, 34, 0.4);
+  --same-bg: transparent;
+  --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas,
+    monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
+    sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}

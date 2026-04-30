@@ -7,10 +7,10 @@
 *.dll
 *.so
 *.dylib
-
+.env
 # Test binary, built with `go test -c`
 *.test
-
+.DS_Store
 # Code coverage profiles and other test artifacts
 *.out
 coverage.*

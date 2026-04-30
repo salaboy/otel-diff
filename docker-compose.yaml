@@ -1,0 +1,86 @@
+services:
+  otel-diff:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - otel-collector
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    user: "0"
+    command: ["--config", "/etc/otelcol/config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otelcol/config.yaml:ro
+      - ./otel-data:/tmp/otel
+    ports:
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+
+
+  spring-merch-store-arconia-openinference:
+    image: salaboy/spring-merch-store-arconia-openinference:0.0.1
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
+      - OTEL_SERVICE_NAME=spring-merch-store-arconia-openinference
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    ports:
+      - "8081:8080"
+    depends_on:
+      - otel-collector
+
+  python-merch-store-langchain-official:
+    image: salaboy/python-merch-store-otel-langchain-official:0.0.4
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
+      - OTEL_SERVICE_NAME=python-merch-store-langchain
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    ports:
+      - "8082:8080"
+    depends_on:
+      - otel-collector
+
+  spring-merch-store-arconia:
+    image: salaboy/spring-merch-store-arconia:0.0.5
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
+      - OTEL_SERVICE_NAME=spring-merch-store-arconia
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    ports:
+      - "8083:8080"
+    depends_on:
+      - otel-collector
+
+  crew-merch-store:
+    image: salaboy/crew-merch-store:0.0.1
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
+      - OTEL_SERVICE_NAME=crew-merch-store
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    ports:
+      - "8084:8080"
+    depends_on:
+      - otel-collector
+
+  spring-merch-store-arconia-langsmith:
+    image: salaboy/spring-merch-store-arconia-langsmith:0.0.2
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
+      - OTEL_SERVICE_NAME=spring-merch-store-arconia-langsmith
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    ports:
+      - "8086:8080"
+    depends_on:
+      - otel-collector
+
+  python-merch-store-langchain-traceloop:
+    image: salaboy/python-merch-store-otel-langchain-traceloop:0.0.2
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
+      - OTEL_SERVICE_NAME=python-merch-store-langchain-traceloop
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    ports:
+      - "8085:8080"
+    depends_on:
+      - otel-collector
+

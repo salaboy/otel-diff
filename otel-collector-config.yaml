@@ -1,0 +1,202 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+connectors:
+  routing/traces:
+    table:
+      - statement: route() where resource.attributes["service.name"] == "spring-merch-store-arconia-openinference"
+        pipelines: [traces/spring-openinference]
+      - statement: route() where resource.attributes["service.name"] == "python-merch-store-langchain-official"
+        pipelines: [traces/python-langchain-official]
+      - statement: route() where resource.attributes["service.name"] == "spring-merch-store-arconia"
+        pipelines: [traces/spring-arconia]
+      - statement: route() where resource.attributes["service.name"] == "crew-merch-store"
+        pipelines: [traces/crew]
+      - statement: route() where resource.attributes["service.name"] == "spring-merch-store-arconia-langsmith"
+        pipelines: [traces/spring-langsmith]
+      - statement: route() where resource.attributes["service.name"] == "python-merch-store-langchain-traceloop"
+        pipelines: [traces/python-langchain-traceloop]
+
+  routing/metrics:
+    table:
+      - statement: route() where resource.attributes["service.name"] == "spring-merch-store-arconia-openinference"
+        pipelines: [metrics/spring-openinference]
+      - statement: route() where resource.attributes["service.name"] == "python-merch-store-langchain-official"
+        pipelines: [metrics/python-langchain-official]
+      - statement: route() where resource.attributes["service.name"] == "spring-merch-store-arconia"
+        pipelines: [metrics/spring-arconia]
+      - statement: route() where resource.attributes["service.name"] == "crew-merch-store"
+        pipelines: [metrics/crew]
+      - statement: route() where resource.attributes["service.name"] == "spring-merch-store-arconia-langsmith"
+        pipelines: [metrics/spring-langsmith]
+      - statement: route() where resource.attributes["service.name"] == "python-merch-store-langchain-traceloop"
+        pipelines: [metrics/python-langchain-traceloop]
+
+  routing/logs:
+    table:
+      - statement: route() where resource.attributes["service.name"] == "spring-merch-store-arconia-openinference"
+        pipelines: [logs/spring-openinference]
+      - statement: route() where resource.attributes["service.name"] == "python-merch-store-langchain-official"
+        pipelines: [logs/python-langchain-official]
+      - statement: route() where resource.attributes["service.name"] == "spring-merch-store-arconia"
+        pipelines: [logs/spring-arconia]
+      - statement: route() where resource.attributes["service.name"] == "crew-merch-store"
+        pipelines: [logs/crew]
+      - statement: route() where resource.attributes["service.name"] == "spring-merch-store-arconia-langsmith"
+        pipelines: [logs/spring-langsmith]
+      - statement: route() where resource.attributes["service.name"] == "python-merch-store-langchain-traceloop"
+        pipelines: [logs/python-langchain-traceloop]
+
+exporters:
+  debug:
+    verbosity: detailed
+
+  # spring-merch-store-arconia-openinference
+  file/traces-spring-openinference:
+    path: /tmp/otel/spring-merch-store-arconia-openinference/traces.jsonl
+    format: json
+  file/metrics-spring-openinference:
+    path: /tmp/otel/spring-merch-store-arconia-openinference/metrics.jsonl
+    format: json
+  file/logs-spring-openinference:
+    path: /tmp/otel/spring-merch-store-arconia-openinference/logs.jsonl
+    format: json
+
+  # python-merch-store-langchain-official
+  file/traces-python-langchain-official:
+    path: /tmp/otel/python-merch-store-langchain-official/traces.jsonl
+    format: json
+  file/metrics-python-langchain-official:
+    path: /tmp/otel/python-merch-store-langchain-official/metrics.jsonl
+    format: json
+  file/logs-python-langchain-official:
+    path: /tmp/otel/python-merch-store-langchain-official/logs.jsonl
+    format: json
+
+  # spring-merch-store-arconia
+  file/traces-spring-arconia:
+    path: /tmp/otel/spring-merch-store-arconia/traces.jsonl
+    format: json
+  file/metrics-spring-arconia:
+    path: /tmp/otel/spring-merch-store-arconia/metrics.jsonl
+    format: json
+  file/logs-spring-arconia:
+    path: /tmp/otel/spring-merch-store-arconia/logs.jsonl
+    format: json
+
+  # crew-merch-store
+  file/traces-crew:
+    path: /tmp/otel/crew-merch-store/traces.jsonl
+    format: json
+  file/metrics-crew:
+    path: /tmp/otel/crew-merch-store/metrics.jsonl
+    format: json
+  file/logs-crew:
+    path: /tmp/otel/crew-merch-store/logs.jsonl
+    format: json
+
+  # spring-merch-store-arconia-langsmith
+  file/traces-spring-langsmith:
+    path: /tmp/otel/spring-merch-store-arconia-langsmith/traces.jsonl
+    format: json
+  file/metrics-spring-langsmith:
+    path: /tmp/otel/spring-merch-store-arconia-langsmith/metrics.jsonl
+    format: json
+  file/logs-spring-langsmith:
+    path: /tmp/otel/spring-merch-store-arconia-langsmith/logs.jsonl
+    format: json
+
+  # python-merch-store-langchain-traceloop
+  file/traces-python-langchain-traceloop:
+    path: /tmp/otel/python-merch-store-langchain-traceloop/traces.jsonl
+    format: json
+  file/metrics-python-langchain-traceloop:
+    path: /tmp/otel/python-merch-store-langchain-traceloop/metrics.jsonl
+    format: json
+  file/logs-python-langchain-traceloop:
+    path: /tmp/otel/python-merch-store-langchain-traceloop/logs.jsonl
+    format: json
+
+service:
+  pipelines:
+    # Ingestion pipelines — receive OTLP and route by service.name
+    traces:
+      receivers: [otlp]
+      exporters: [routing/traces]
+    metrics:
+      receivers: [otlp]
+      exporters: [routing/metrics]
+    logs:
+      receivers: [otlp]
+      exporters: [routing/logs]
+
+    # spring-merch-store-arconia-openinference
+    traces/spring-openinference:
+      receivers: [routing/traces]
+      exporters: [file/traces-spring-openinference]
+    metrics/spring-openinference:
+      receivers: [routing/metrics]
+      exporters: [file/metrics-spring-openinference]
+    logs/spring-openinference:
+      receivers: [routing/logs]
+      exporters: [file/logs-spring-openinference]
+
+    # python-merch-store-langchain-official
+    traces/python-langchain-official:
+      receivers: [routing/traces]
+      exporters: [file/traces-python-langchain-official]
+    metrics/python-langchain-official:
+      receivers: [routing/metrics]
+      exporters: [file/metrics-python-langchain-official]
+    logs/python-langchain-official:
+      receivers: [routing/logs]
+      exporters: [file/logs-python-langchain-official]
+
+    # spring-merch-store-arconia
+    traces/spring-arconia:
+      receivers: [routing/traces]
+      exporters: [file/traces-spring-arconia]
+    metrics/spring-arconia:
+      receivers: [routing/metrics]
+      exporters: [file/metrics-spring-arconia]
+    logs/spring-arconia:
+      receivers: [routing/logs]
+      exporters: [file/logs-spring-arconia]
+
+    # crew-merch-store
+    traces/crew:
+      receivers: [routing/traces]
+      exporters: [file/traces-crew]
+    metrics/crew:
+      receivers: [routing/metrics]
+      exporters: [file/metrics-crew]
+    logs/crew:
+      receivers: [routing/logs]
+      exporters: [file/logs-crew]
+
+    # spring-merch-store-arconia-langsmith
+    traces/spring-langsmith:
+      receivers: [routing/traces]
+      exporters: [file/traces-spring-langsmith]
+    metrics/spring-langsmith:
+      receivers: [routing/metrics]
+      exporters: [file/metrics-spring-langsmith]
+    logs/spring-langsmith:
+      receivers: [routing/logs]
+      exporters: [file/logs-spring-langsmith]
+
+    # python-merch-store-langchain-traceloop
+    traces/python-langchain-traceloop:
+      receivers: [routing/traces]
+      exporters: [file/traces-python-langchain-traceloop]
+    metrics/python-langchain-traceloop:
+      receivers: [routing/metrics]
+      exporters: [file/metrics-python-langchain-traceloop]
+    logs/python-langchain-traceloop:
+      receivers: [routing/logs]
+      exporters: [file/logs-python-langchain-traceloop]
